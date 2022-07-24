@@ -30,12 +30,12 @@ variable "function_jar" {
 
 variable "name" {
   description = "The name of the Lambda function"
-  type        = String
-  default     = "function"
+  type        = string
+  default     = "cv-server"
 }
 
 resource "aws_iam_role" "lambda-iam" {
-  name = "lambda-iam"
+  name = "lambda-iam--cv-server"
 
   # Terraform's "jsonencode" function converts a Terraform expression result to valid JSON syntax.
   assume_role_policy = jsonencode({
@@ -58,7 +58,7 @@ resource "aws_lambda_function" "lambda" {
   source_code_hash = base64sha256(filebase64(var.function_jar))
   function_name    = var.name
   role             = aws_iam_role.lambda-iam.arn
-  handler          = "io.micronaut.function.aws.MicronautRequestStreamHandler"
+  handler          = "Application::handleRequest"
   runtime          = "java11"
 }
 

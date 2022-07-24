@@ -11,7 +11,7 @@ internal class ApplicationTest {
 		val input = HandlerInput()
 		input.booked = listOf(1, 2, 3)
 		input.paid = listOf(1, 2, 3)
-		val expected = HandlerOutput(input.booked, input.paid, 0);
+		val expected = HandlerOutput(difference = 0);
 
 		val sut = Application()
 		val result = sut.handleRequest(input = input, context = null)
@@ -22,7 +22,7 @@ internal class ApplicationTest {
 	@Test
 	fun `Test that empty input returns zero values`() {
 		val input = null
-		val expected = HandlerOutput(emptyList(), emptyList(), 0);
+		val expected = HandlerOutput(difference = 0);
 
 		val sut = Application()
 		val result = sut.handleRequest(input = input, context = null)
