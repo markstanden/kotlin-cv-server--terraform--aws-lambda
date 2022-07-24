@@ -1,0 +1,175 @@
+{
+	"info": {
+		"_postman_id": "f0007e78-712f-496f-96c3-f54bb0de09ab",
+		"name": "Basic_Lambda",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14041453"
+	},
+	"item": [
+		{
+			"name": "Lambda Test 0",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Difference Should Be Zero\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.difference).to.eql(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"booked\":[1,2,3],\n    \"paid\":[1,2,3]\n}"
+				},
+				"url": {
+					"raw": "https://l0ucuokk7d.execute-api.us-east-1.amazonaws.com/default/OvertimeCalculator",
+					"protocol": "https",
+					"host": [
+						"l0ucuokk7d",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"default",
+						"OvertimeCalculator"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lambda Test 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Difference Should Be 1\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.difference).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"booked\":[1,2,3],\n    \"paid\":[2,2,3]\n}"
+				},
+				"url": {
+					"raw": "https://l0ucuokk7d.execute-api.us-east-1.amazonaws.com/default/OvertimeCalculator",
+					"protocol": "https",
+					"host": [
+						"l0ucuokk7d",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"default",
+						"OvertimeCalculator"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Lambda Test -1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Difference Should Be -1\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.difference).to.eql(-1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"booked\":[2,2,3],\n    \"paid\":[1,2,3]\n}"
+				},
+				"url": {
+					"raw": "https://l0ucuokk7d.execute-api.us-east-1.amazonaws.com/default/OvertimeCalculator",
+					"protocol": "https",
+					"host": [
+						"l0ucuokk7d",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"default",
+						"OvertimeCalculator"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
