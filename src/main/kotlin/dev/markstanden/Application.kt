@@ -10,8 +10,7 @@ class Application : RequestHandler<HandlerInput, HandlerOutput> {
 	override fun handleRequest(input: HandlerInput?, context: Context?): HandlerOutput {
 		input?.let {
 			return lambda.execute(input)
-
 		}
-		return HandlerOutput();
+		return HandlerOutput(99999)
 	}
 }

@@ -58,38 +58,43 @@ resource "aws_lambda_function" "lambda" {
   source_code_hash = base64sha256(filebase64(var.function_jar))
   function_name    = var.name
   role             = aws_iam_role.lambda-iam.arn
-  handler          = "Application::handleRequest"
+  handler          = "dev.markstanden.Application::handleRequest"
   runtime          = "java11"
 }
+#
+#resource "aws_apigatewayv2_api" "lambda-api" {
+#  name          = "v2-http-api"
+#  protocol_type = "HTTP"
+#}
+#
+#resource "aws_apigatewayv2_stage" "lambda-stage" {
+#  api_id      = aws_apigatewayv2_api.lambda-api.id
+#  name        = "default"
+#  auto_deploy = true
+#}
+#
+#resource "aws_apigatewayv2_integration" "lambda-integration" {
+#  api_id               = aws_apigatewayv2_api.lambda-api.id
+#  integration_type     = "AWS_PROXY"
+#  integration_uri      = aws_lambda_function.lambda.invoke_arn
+#  passthrough_behavior = "WHEN_NO_MATCH"
+#}
 
-resource "aws_apigatewayv2_api" "lambda-api" {
-  name          = "v2-http-api"
-  protocol_type = "HTTP"
-}
+#resource "aws_apigatewayv2_route" "lambda_route" {
+#  api_id    = aws_apigatewayv2_api.lambda-api.id
+#  route_key = "$default"
+#  target    = "integrations/${aws_apigatewayv2_integration.lambda-integration.id}"
+#}
 
-resource "aws_apigatewayv2_stage" "lambda-stage" {
-  api_id      = aws_apigatewayv2_api.lambda-api.id
-  name        = "default"
-  auto_deploy = true
-}
+#resource "aws_lambda_permission" "api-gw" {
+#  action        = "lambda:InvokeFunction"
+#  function_name = aws_lambda_function.lambda.arn
+#  principal     = "apigateway.amazonaws.com"
+#  statement_id  = "AllowExecutionFromAPIGateway"
+#  source_arn    = "${aws_apigatewayv2_api.lambda-api.execution_arn}/*/*/*"
+#}
 
-resource "aws_apigatewayv2_integration" "lambda-integration" {
-  api_id               = aws_apigatewayv2_api.lambda-api.id
-  integration_type     = "AWS_PROXY"
-  integration_uri      = aws_lambda_function.lambda.invoke_arn
-  passthrough_behavior = "WHEN_NO_MATCH"
-}
-
-resource "aws_apigatewayv2_route" "lambda_route" {
-  api_id    = aws_apigatewayv2_api.lambda-api.id
-  route_key = "GET /{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda-integration.id}"
-}
-
-resource "aws_lambda_permission" "api-gw" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda.arn
-  principal     = "apigateway.amazonaws.com"
-  statement_id  = "AllowExecutionFromAPIGateway"
-  source_arn    = "${aws_apigatewayv2_api.lambda-api.execution_arn}/*/*/*"
+resource "aws_lambda_function_url" "lambda-url" {
+  authorization_type = "NONE"
+  function_name      = aws_lambda_function.lambda.arn
 }
