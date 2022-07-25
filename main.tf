@@ -54,6 +54,7 @@ resource "aws_iam_role" "lambda-iam" {
 }
 
 resource "aws_lambda_function" "lambda" {
+  architectures    = ["x86_64"]
   filename         = var.function_jar
   source_code_hash = base64sha256(filebase64(var.function_jar))
   function_name    = var.name
@@ -61,18 +62,42 @@ resource "aws_lambda_function" "lambda" {
   handler          = "dev.markstanden.Application::handleRequest"
   runtime          = "java11"
 }
-#
-#resource "aws_apigatewayv2_api" "lambda-api" {
-#  name          = "v2-http-api"
-#  protocol_type = "HTTP"
-#}
-#
+
+resource "aws_api_gateway_rest_api" "lambda-api" {
+  name = "rest-api"
+}
+
+resource "aws_api_gateway_resource" "rest-resource" {
+  rest_api_id = aws_api_gateway_rest_api.lambda-api.id
+  parent_id   = aws_api_gateway_rest_api.lambda-api.root_resource_id
+  path_part   = "test"
+  lifecycle {}
+}
+
+resource "aws_api_gateway_method" "rest-post" {
+  authorization = "NONE"
+  http_method   = "POST"
+  resource_id   = aws_api_gateway_resource.rest-resource.id
+  rest_api_id   = aws_api_gateway_rest_api.lambda-api.id
+}
+
 #resource "aws_apigatewayv2_stage" "lambda-stage" {
 #  api_id      = aws_apigatewayv2_api.lambda-api.id
 #  name        = "default"
 #  auto_deploy = true
 #}
 #
+
+resource "aws_api_gateway_integration" "integration" {
+  rest_api_id             = aws_api_gateway_rest_api.lambda-api.id
+  resource_id             = aws_api_gateway_resource.rest-resource.id
+  http_method             = aws_api_gateway_method.rest-post.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.lambda.invoke_arn
+}
+
+
 #resource "aws_apigatewayv2_integration" "lambda-integration" {
 #  api_id               = aws_apigatewayv2_api.lambda-api.id
 #  integration_type     = "AWS_PROXY"
@@ -86,15 +111,16 @@ resource "aws_lambda_function" "lambda" {
 #  target    = "integrations/${aws_apigatewayv2_integration.lambda-integration.id}"
 #}
 
-#resource "aws_lambda_permission" "api-gw" {
-#  action        = "lambda:InvokeFunction"
-#  function_name = aws_lambda_function.lambda.arn
-#  principal     = "apigateway.amazonaws.com"
-#  statement_id  = "AllowExecutionFromAPIGateway"
-#  source_arn    = "${aws_apigatewayv2_api.lambda-api.execution_arn}/*/*/*"
-#}
-
-resource "aws_lambda_function_url" "lambda-url" {
-  authorization_type = "NONE"
-  function_name      = aws_lambda_function.lambda.arn
+resource "aws_lambda_permission" "api-gw" {
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda.arn
+  principal     = "apigateway.amazonaws.com"
+  statement_id  = "AllowExecutionFromAPIGateway"
+  source_arn    = "${aws_api_gateway_rest_api.lambda-api.execution_arn}/*/*/*"
 }
+
+
+#resource "aws_lambda_function_url" "lambda-url" {
+#  authorization_type = "NONE"
+#  function_name      = aws_lambda_function.lambda.arn
+#}
