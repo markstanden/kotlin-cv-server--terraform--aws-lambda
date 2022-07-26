@@ -34,7 +34,7 @@ variable "name" {
   default     = "cv-server"
 }
 
-resource "aws_iam_role" "lambda-iam" {
+resource "aws_iam_role" "lambda-exec" {
   name = "lambda-iam--cv-server"
 
   # Terraform's "jsonencode" function converts a Terraform expression result to valid JSON syntax.
@@ -58,69 +58,82 @@ resource "aws_lambda_function" "lambda" {
   filename         = var.function_jar
   source_code_hash = base64sha256(filebase64(var.function_jar))
   function_name    = var.name
-  role             = aws_iam_role.lambda-iam.arn
+  role             = aws_iam_role.lambda-exec.arn
   handler          = "dev.markstanden.Application::handleRequest"
-  runtime          = "java11"
+  runtime          = "java8"
 }
 
-resource "aws_api_gateway_rest_api" "lambda-api" {
-  name = "rest-api"
+resource "aws_cloudwatch_log_group" "lambda-log" {
+  name              = "/aws/lambda/${var.name}"
+  retention_in_days = 7
 }
 
-resource "aws_api_gateway_resource" "rest-resource" {
-  rest_api_id = aws_api_gateway_rest_api.lambda-api.id
-  parent_id   = aws_api_gateway_rest_api.lambda-api.root_resource_id
-  path_part   = "test"
-  lifecycle {}
+resource "aws_iam_role_policy_attachment" "lambda_policy" {
+  role       = aws_iam_role.lambda-exec.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_api_gateway_method" "rest-post" {
-  authorization = "NONE"
-  http_method   = "POST"
-  resource_id   = aws_api_gateway_resource.rest-resource.id
-  rest_api_id   = aws_api_gateway_rest_api.lambda-api.id
+resource "aws_apigatewayv2_api" "lambda" {
+  name          = "serverless_lambda_gw"
+  protocol_type = "HTTP"
 }
 
-#resource "aws_apigatewayv2_stage" "lambda-stage" {
-#  api_id      = aws_apigatewayv2_api.lambda-api.id
-#  name        = "default"
-#  auto_deploy = true
-#}
-#
+resource "aws_apigatewayv2_stage" "lambda" {
+  api_id      = aws_apigatewayv2_api.lambda.id
+  name        = "serverless_lambda_stage"
+  auto_deploy = true
 
-resource "aws_api_gateway_integration" "integration" {
-  rest_api_id             = aws_api_gateway_rest_api.lambda-api.id
-  resource_id             = aws_api_gateway_resource.rest-resource.id
-  http_method             = aws_api_gateway_method.rest-post.http_method
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.lambda.invoke_arn
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.lambda-log.arn
+
+    format = jsonencode({
+      requestId               = "$context.requestId"
+      sourceIp                = "$context.identity.sourceIp"
+      requestTime             = "$context.requestTime"
+      protocol                = "$context.protocol"
+      httpMethod              = "$context.httpMethod"
+      resourcePath            = "$context.resourcePath"
+      routeKey                = "$context.routeKey"
+      status                  = "$context.status"
+      responseLength          = "$context.responseLength"
+      integrationErrorMessage = "$context.integrationErrorMessage"
+    }
+    )
+  }
 }
 
+resource "aws_apigatewayv2_integration" "lambda_integration" {
+  api_id = aws_apigatewayv2_api.lambda.id
 
-#resource "aws_apigatewayv2_integration" "lambda-integration" {
-#  api_id               = aws_apigatewayv2_api.lambda-api.id
-#  integration_type     = "AWS_PROXY"
-#  integration_uri      = aws_lambda_function.lambda.invoke_arn
-#  passthrough_behavior = "WHEN_NO_MATCH"
-#}
+  integration_uri    = aws_lambda_function.lambda.invoke_arn
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+}
 
-#resource "aws_apigatewayv2_route" "lambda_route" {
-#  api_id    = aws_apigatewayv2_api.lambda-api.id
-#  route_key = "$default"
-#  target    = "integrations/${aws_apigatewayv2_integration.lambda-integration.id}"
-#}
+resource "aws_apigatewayv2_route" "lambda_route" {
+  api_id = aws_apigatewayv2_api.lambda.id
 
-resource "aws_lambda_permission" "api-gw" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda.arn
-  principal     = "apigateway.amazonaws.com"
+  route_key = "POST /test"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+resource "aws_cloudwatch_log_group" "api_gw" {
+  name = "/aws/api_gw/${aws_apigatewayv2_api.lambda.name}"
+
+  retention_in_days = 1
+}
+
+resource "aws_lambda_permission" "api_gw" {
   statement_id  = "AllowExecutionFromAPIGateway"
-  source_arn    = "${aws_api_gateway_rest_api.lambda-api.execution_arn}/*/*/*"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*/*"
 }
 
 
-#resource "aws_lambda_function_url" "lambda-url" {
-#  authorization_type = "NONE"
-#  function_name      = aws_lambda_function.lambda.arn
-#}
+output "url" {
+  value = aws_apigatewayv2_api.lambda.api_endpoint
+
+}

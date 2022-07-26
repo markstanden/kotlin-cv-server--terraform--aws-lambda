@@ -1,6 +1,6 @@
 package dev.markstanden
 
-class HandlerInput {
-	var booked: List<Int> = emptyList()
-	var paid: List<Int> = emptyList()
-}
+data class HandlerInput(
+	val booked: List<Int> = emptyList(),
+	val paid: List<Int> = emptyList(),
+)
