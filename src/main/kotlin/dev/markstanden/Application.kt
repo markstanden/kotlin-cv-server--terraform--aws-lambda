@@ -14,21 +14,17 @@ class Application : RequestStreamHandler {
 	private val mapper = jacksonObjectMapper()
 
 	override fun handleRequest(input: InputStream?, output: OutputStream?, context: Context?) {
-		input?.let { input ->
-			val inputObj = mapper.readValue(input, HandlerInput::class.java)
-			val result = HandlerOutput(difference = inputObj.paid.sum() - inputObj.booked.sum())
+		val inputObj = mapper.readValue(input, HandlerInput::class.java)
+		val result = HandlerOutput(difference = inputObj.paid.sum() - inputObj.booked.sum())
 
-			context?.let { context ->
-				val logger: LambdaLogger = context.logger
-				logger.log("Input: ${input.readAllBytes().toString()}")
-				logger.log("Booked: ${inputObj.booked}")
-				logger.log("Paid: ${inputObj.paid}")
-				logger.log("Result: $result")
-
-			}
-
-			mapper.writeValue(output, result)
+		context?.let { context ->
+			val logger: LambdaLogger = context.logger
+			logger.log("Booked: ${inputObj.booked}")
+			logger.log("Paid: ${inputObj.paid}")
+			logger.log("Result: $result")
 		}
+
+		mapper.writeValue(output, result)
 	}
 
 //	override fun handleRequest(input: HandlerInput?, context: Context?): HandlerOutput {

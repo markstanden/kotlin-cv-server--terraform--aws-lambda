@@ -64,7 +64,7 @@ resource "aws_lambda_function" "lambda" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda-log" {
-  name              = "/aws/lambda/${var.name}"
+  name              = "/aws/lambda/${aws_lambda_function.lambda.function_name}"
   retention_in_days = 7
 }
 
@@ -84,7 +84,7 @@ resource "aws_apigatewayv2_stage" "lambda" {
   auto_deploy = true
 
   access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.lambda-log.arn
+    destination_arn = aws_cloudwatch_log_group.api_gw.arn
 
     format = jsonencode({
       requestId               = "$context.requestId"
