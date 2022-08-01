@@ -18,10 +18,12 @@ repositories {
 
 dependencies {
 	implementation(kotlin("stdlib:1.7.10"))
-//	implementation(kotlin("stdlib-jdk8"))
 	implementation("com.amazonaws:aws-lambda-java-core:1.2.1")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.8.2")
-//	implementation("com.github.fasterxml:jackson-core:jackson-core-2.13.3")
+	implementation("com.amazonaws:aws-lambda-java-events:3.6.0")
+	implementation("com.amazonaws:aws-lambda-java-tests:1.1.1")
+	implementation("com.amazonaws:aws-java-sdk-bom:1.12.239")
+	implementation("com.amazonaws:aws-lambda-java-events-sdk-transformer:3.1.0")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3")
 	testImplementation(kotlin("test"))
 }
 

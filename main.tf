@@ -60,7 +60,7 @@ resource "aws_lambda_function" "lambda" {
   function_name    = var.name
   role             = aws_iam_role.lambda-exec.arn
   handler          = "dev.markstanden.Application::handleRequest"
-  runtime          = "java8"
+  runtime          = "java11"
 }
 
 resource "aws_cloudwatch_log_group" "lambda-log" {
@@ -113,7 +113,7 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
 resource "aws_apigatewayv2_route" "lambda_route" {
   api_id = aws_apigatewayv2_api.lambda.id
 
-  route_key = "POST /test"
+  route_key = "$default"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
@@ -135,5 +135,8 @@ resource "aws_lambda_permission" "api_gw" {
 
 output "url" {
   value = aws_apigatewayv2_api.lambda.api_endpoint
+}
 
+output "url_with_stage" {
+  value = aws_apigatewayv2_api.lambda.target
 }
