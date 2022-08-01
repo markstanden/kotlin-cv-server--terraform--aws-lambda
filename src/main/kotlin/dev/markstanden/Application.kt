@@ -29,6 +29,8 @@ class Application : RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPRespon
 			"<p>requestContext: ${input?.requestContext}</p>" +
 			"<p>Raw Query String: ${input?.rawQueryString}</p>" +
 			"<p>Stage: ${input?.requestContext?.stage}</p>" +
+			"<p>path: ${input?.requestContext?.http?.path}</p>" +
+			"<p>ip: ${input?.requestContext?.http?.sourceIp}</p>" +
 			"</body></html>"
 		return response
 	}

@@ -56,7 +56,7 @@ resource "aws_iam_role" "lambda-exec" {
 resource "aws_lambda_function" "lambda" {
   architectures    = ["x86_64"]
   filename         = var.function_jar
-  source_code_hash = base64sha256(filebase64(var.function_jar))
+  source_code_hash = filebase64sha256(var.function_jar)
   function_name    = var.name
   role             = aws_iam_role.lambda-exec.arn
   handler          = "dev.markstanden.Application::handleRequest"
@@ -113,7 +113,7 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
 resource "aws_apigatewayv2_route" "lambda_route" {
   api_id = aws_apigatewayv2_api.lambda.id
 
-  route_key = "$default"
+  route_key = "POST /{version}"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
