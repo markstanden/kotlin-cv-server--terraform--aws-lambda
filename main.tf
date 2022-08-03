@@ -35,7 +35,7 @@ variable "name" {
 }
 
 resource "aws_iam_role" "lambda-exec" {
-  name = "lambda-iam--cv-server"
+  name = "${var.name}_exec_role"
 
   # Terraform's "jsonencode" function converts a Terraform expression result to valid JSON syntax.
   assume_role_policy = jsonencode({
@@ -57,30 +57,30 @@ resource "aws_lambda_function" "lambda" {
   architectures    = ["x86_64"]
   filename         = var.function_jar
   source_code_hash = filebase64sha256(var.function_jar)
-  function_name    = var.name
+  function_name    = "${var.name}_lambda"
   role             = aws_iam_role.lambda-exec.arn
-  handler          = "dev.markstanden.Application::handleRequest"
+  handler          = "dev.markstanden.DataLookup::handleRequest"
   runtime          = "java11"
 }
 
-resource "aws_cloudwatch_log_group" "lambda-log" {
-  name              = "/aws/lambda/${aws_lambda_function.lambda.function_name}"
-  retention_in_days = 7
-}
 
 resource "aws_iam_role_policy_attachment" "lambda_policy" {
   role       = aws_iam_role.lambda-exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+resource "aws_cloudwatch_log_group" "lambda-log" {
+  name              = "/aws/lambda/${aws_lambda_function.lambda.function_name}"
+  retention_in_days = 7
+}
 
 resource "aws_apigatewayv2_api" "lambda" {
-  name          = "serverless_lambda_gw"
+  name          = "${var.name}_gateway"
   protocol_type = "HTTP"
 }
 
 resource "aws_apigatewayv2_stage" "lambda" {
   api_id      = aws_apigatewayv2_api.lambda.id
-  name        = "serverless_lambda_stage"
+  name        = "${var.name}_stage"
   auto_deploy = true
 
   access_log_settings {

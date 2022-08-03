@@ -11,9 +11,8 @@ internal class BasicOvertimeCalculatorTest {
 		val bookedOT = listOf(1, 2, 3, 4, 5, 6)
 		val paidOT = listOf(1, 2, 3, 4, 5, 6)
 
-		val sut = BasicOvertimeCalculator()
-		val result = sut.calcOffset(booked = bookedOT, paid = paidOT)
-		val expected = 0;
+		val result = calcOffset(booked = bookedOT, paid = paidOT)
+		val expected = 0
 
 		assertEquals(expected, result, "Got paid what was booked, offset should be 0")
 	}
@@ -23,9 +22,8 @@ internal class BasicOvertimeCalculatorTest {
 		val bookedOT = listOf(1, 2, 3, 4, 5, 6)
 		val paidOT = listOf(2, 2, 3, 4, 5, 6)
 
-		val sut = BasicOvertimeCalculator()
-		val result = sut.calcOffset(booked = bookedOT, paid = paidOT)
-		val expected = 1;
+		val result = calcOffset(booked = bookedOT, paid = paidOT)
+		val expected = 1
 
 		assertEquals(expected, result, "Got paid more than was booked, offset should be 1")
 	}
@@ -35,9 +33,8 @@ internal class BasicOvertimeCalculatorTest {
 		val bookedOT = listOf(1, 2, 3, 4, 5, 6)
 		val paidOT = listOf(0, 2, 3, 4, 5, 6)
 
-		val sut = BasicOvertimeCalculator()
-		val result = sut.calcOffset(booked = bookedOT, paid = paidOT)
-		val expected = -1;
+		val result = calcOffset(booked = bookedOT, paid = paidOT)
+		val expected = -1
 
 		assertEquals(expected, result, "Got paid less than was booked, offset should be -1")
 	}
