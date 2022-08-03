@@ -28,16 +28,16 @@ class DataLookup : RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPRespons
 		val result = calcOffset(body.booked, body.paid)
 
 		// build a response
-		return positiveResponse("""{"difference":${result}}""")
+		return positiveResponse(HandlerOutput(difference = result))
 	}
 
-	private fun positiveResponse(
-		body: String = "", contentType: String = "application/json",
+	private inline fun <reified T> positiveResponse(
+		bodyData: T, contentType: String = "application/json",
 	): APIGatewayV2HTTPResponse =
 		APIGatewayV2HTTPResponse.builder()
 			.withStatusCode(200)
 			.withIsBase64Encoded(false)
 			.withHeaders(mapOf("Content-Type" to contentType))
-			.withBody(body)
+			.withBody(jsonParser.encodeToString(bodyData))
 			.build()
 }
