@@ -1,0 +1,179 @@
+{
+	"user": {
+		"name": "First Second",
+		"location": {
+			"city": "City",
+			"country": "Country"
+		},
+		"contact": {
+			"phone": "01234 567890",
+			"email": "email@address.com"
+		},
+		"links": [
+			{
+				"title": "Github",
+				"url": "https://www.github.com"
+			},
+			{
+				"title": "LinkedIn",
+				"url": "https://www.linkedin.com"
+			},
+			{
+				"title": "Blog",
+				"url": "https://www.medium.com"
+			}
+		]
+	},
+	"coverLetter": {
+		"greeting": "Dear Sir/Madam",
+		"text": [
+			"I'm baby hammock af dreamcatcher narwhal farm-to-table forage keffiyeh mixtape palo santo. Mustache slow-carb direct trade humblebrag.",
+			"Tofu vaporware bicycle rights, scenester drinking vinegar air plant franzen activated charcoal humblebrag glossier succulents food truck hell of migas wayfarers.",
+			"Hot chicken master cleanse williamsburg thundercats godard polaroid hashtag subway tile cray. Fam flannel art party snackwave schlitz, normcore vaporware bushwick flexitarian 3 wolf moon iceland ramps crucifix poutine shoreditch.",
+			"Small batch man braid kogi taxidermy, marfa activated charcoal literally fashion axe keytar deep v heirloom. Banh mi occupy hella, shabby chic kombucha pop-up offal praxis banjo tumeric before they sold out. (hipsum.co)"
+		],
+		"signOff": "Yours Faithfully"
+	},
+	"experienceSection": {
+		"title": "Work Experience",
+		"items": [
+			{
+				"title": "position",
+				"business": {
+					"title": "name",
+					"link": "https://www.company.com",
+					"location": {
+						"city": "city",
+						"country": "country"
+					},
+					"department": "particular team"
+				},
+				"dates": "2022 - Present",
+				"content": [
+					"something you did well, use numbers for particular impact.",
+					"e.g. 25% productivity improvement",
+					"Chartreuse normcore swag tonx roof party, hot chicken edison bulb +1 pok pok fanny pack sartorial echo park pabst lo-fi etsy.",
+					"Tonx heirloom sartorial literally lo-fi single-origin coffee iPhone pop-up kale chips keytar hell of twee offal marfa.",
+					"Chicharrones dreamcatcher succulents listicle williamsburg portland adaptogen everyday carry quinoa food truck pork belly fashion axe VHS tacos.",
+					"Edison bulb cray kitsch DIY squid hella."
+				]
+			},
+			{
+				"title": "another position",
+				"business": {
+					"title": "another name",
+					"link": "https://www.anothercompany.com",
+					"location": {
+						"city": "city",
+						"country": "country"
+					},
+					"department": "another team"
+				},
+				"dates": "2021 - 2022",
+				"content": [
+					"something you did well, still using numbers for impact.",
+					"less details",
+					"Meggings cred locavore taiyaki tote bag slow-carb organic letterpress bespoke street art banh mi listicle synth brooklyn gastropub.",
+					"Vice pour-over poke, selvage vinyl small batch narwhal church-key salvia.",
+					"Craft beer scenester poke, ethical taiyaki cronut pop-up blue bottle artisan."
+				]
+			},
+			{
+				"title": "yet another position",
+				"business": {
+					"title": "yet another name",
+					"link": "https://www.yetanothercompany.com",
+					"location": {
+						"city": "yetanothercity",
+						"country": "yetanothercountry"
+					},
+					"department": "yet another team"
+				},
+				"dates": "2020 - 2021",
+				"content": [
+					"something you did well, still using numbers for impact.",
+					"less details",
+					"Cold-pressed hashtag kombucha, iceland lo-fi affogato narwhal fingerstache flannel occupy keytar",
+					"Kinfolk af hoodie, VHS live-edge butcher gluten-free quinoa keytar meditation cray."
+				]
+			}
+		]
+	},
+	"sections": [
+		{
+			"title": "Technologies and Languages",
+			"items": [
+				{
+					"title": "Languages",
+					"content": [
+						"language",
+						"other language",
+						"other languages..."
+					]
+				},
+				{
+					"title": "Technologies",
+					"content": [
+						"tech",
+						"other tech"
+					]
+				},
+				{
+					"title": "Skills",
+					"content": [
+						"skill",
+						"other skill",
+						"other skills..."
+					]
+				}
+			]
+		},
+		{
+			"title": "Education and Certifications",
+			"items": [
+				{
+					"title": "qualification",
+					"content": [
+						"location"
+					],
+					"dates": "2022-2022"
+				},
+				{
+					"title": "other qualification",
+					"content": [
+						"other location"
+					],
+					"dates": "2021-2021"
+				}
+			]
+		},
+		{
+			"title": "Projects",
+			"items": [
+				{
+					"title": "Project Name",
+					"content": [
+						"description of a standout project"
+					]
+				},
+				{
+					"title": "Another Project Name",
+					"content": [
+						"description of another standout project"
+					]
+				}
+			]
+		},
+		{
+			"title": "Other Section",
+			"items": [
+				{
+					"title": "Subtitles",
+					"content": [
+						"List of items"
+					]
+				}
+			]
+		}
+	]
+}

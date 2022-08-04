@@ -5,6 +5,9 @@ import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
+import dev.markstanden.Files.asResource
+import dev.markstanden.models.CV
+import dev.markstanden.models.CoverLetter
 import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 
@@ -25,10 +28,10 @@ class DataLookup : RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPRespons
 		// Use Kotlin's serialise to convert body string into a kotlin data object.
 		val body = jsonParser.decodeFromString<HandlerInput>(bodyString)
 
-		val result = calcOffset(body.booked, body.paid)
+		val sampleCV = Json.decodeFromString(CV.serializer(), asResource(path = "/assets/sampleCV.json")!!)
 
 		// build a response
-		return positiveResponse(HandlerOutput(difference = result))
+		return positiveResponse(CoverLetter("Test", listOf("Test"), "Test"), CV(asResource()))
 	}
 
 	private inline fun <reified T> positiveResponse(
