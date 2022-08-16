@@ -61,6 +61,7 @@ resource "aws_lambda_function" "lambda" {
   role             = aws_iam_role.lambda-exec.arn
   handler          = "dev.markstanden.DataLookup::handleRequest"
   runtime          = "java11"
+  timeout          = 10
 }
 
 

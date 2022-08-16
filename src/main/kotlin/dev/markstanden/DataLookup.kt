@@ -20,22 +20,25 @@ class DataLookup : RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPRespons
 
 		// Obtain the path variable
 		val path = input?.pathParameters?.get("version") ?: "default"
-		val bodyString = input?.body ?: ""
+		//val bodyString = input?.body ?: ""
 
 		// Get the logger from the lambda context and log the path attempt.
 		context?.logger?.log("Access made with version: $path")
 
 		// Use Kotlin's serialise to convert body string into a kotlin data object.
-		val body = jsonParser.decodeFromString<HandlerInput>(bodyString)
+		//val body = jsonParser.decodeFromString<HandlerInput>(bodyString)
 
 		val sampleCV = Json.decodeFromString(CV.serializer(), asResource(path = "/assets/sampleCV.json")!!)
+		context?.logger?.log("Cover Letter: ${sampleCV.coverLetter}")
 
 		// build a response
-		return positiveResponse(CoverLetter("Test", listOf("Test"), "Test"), CV(asResource()))
+		val res = positiveResponse(sampleCV)
+		context?.logger?.log("Response Body: ${res.body}")
+		return res
 	}
 
-	private inline fun <reified T> positiveResponse(
-		bodyData: T, contentType: String = "application/json",
+	private fun positiveResponse(
+		bodyData: CV, contentType: String = "application/json",
 	): APIGatewayV2HTTPResponse =
 		APIGatewayV2HTTPResponse.builder()
 			.withStatusCode(200)
