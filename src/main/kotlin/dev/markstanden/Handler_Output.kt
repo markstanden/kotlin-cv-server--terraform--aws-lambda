@@ -5,7 +5,7 @@ import dev.markstanden.models.CoverLetter
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class HandlerOutput(
+data class Handler_Output(
 	val coverLetter: CoverLetter?,
 	val cv: CV?,
 )

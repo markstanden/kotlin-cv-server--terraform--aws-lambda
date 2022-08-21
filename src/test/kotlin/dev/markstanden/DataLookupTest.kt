@@ -2,6 +2,7 @@ package dev.markstanden
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
+import io.ktor.http.*
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -45,6 +46,19 @@ internal class DataLookupTest {
 		)
 		val result = sut.handleRequest(input = input, context = null)
 
-		expected.forEach { assertContains(result.body, it) }
+		expected.forEach { assertContains(result.body, it, message = "test word '$it' not found within result") }
+	}
+
+	@Test
+	fun `Test that handler returns error if default path is attempted`() {
+		val inputString = """{"test":"Shouldn't Matter"}"""
+		val path = null
+
+		val input =
+			APIGatewayV2HTTPEvent.builder().withBody(inputString).withPathParameters(mapOf("version" to path)).build()
+
+		val sut = DataLookup()
+		val result = sut.handleRequest(input = input, context = null)
+		assertFalse(result.statusCode == HttpStatusCode.OK.value)
 	}
 }
