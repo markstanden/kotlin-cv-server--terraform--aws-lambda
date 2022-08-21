@@ -22,6 +22,19 @@ variable "aws_secret_key" {
   type        = string
 }
 
+variable "github_secret_key" {
+  description = "Github API Key"
+  type        = string
+}
+variable "github_username" {
+  description = "Github Username"
+  type        = string
+}
+variable "github_repo" {
+  description = "Github repo that the cv data is stored in."
+  type        = string
+}
+
 variable "function_jar" {
   description = "Path to shadowjar file"
   type        = string
@@ -62,6 +75,13 @@ resource "aws_lambda_function" "lambda" {
   handler          = "dev.markstanden.DataLookup::handleRequest"
   runtime          = "java11"
   timeout          = 10
+  environment {
+    variables = {
+      PERSONAL_ACCESS_TOKEN = var.github_secret_key
+      USER_NAME = var.github_username
+      REPO_NAME = var.github_repo
+    }
+  }
 }
 
 

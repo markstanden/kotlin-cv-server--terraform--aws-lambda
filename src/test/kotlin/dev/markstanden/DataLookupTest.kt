@@ -6,6 +6,7 @@ import io.ktor.http.*
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+import kotlin.test.Ignore
 import kotlin.test.assertContains
 
 internal class DataLookupTest {
