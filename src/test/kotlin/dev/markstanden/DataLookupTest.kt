@@ -4,9 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
 import io.ktor.http.*
 import org.junit.jupiter.api.Test
-
 import org.junit.jupiter.api.Assertions.*
-import kotlin.test.Ignore
 import kotlin.test.assertContains
 
 internal class DataLookupTest {
@@ -44,6 +42,23 @@ internal class DataLookupTest {
 		val expected = listOf<String>(
 			"name", "First Second", "location", "city", "City", "country", "Country", "contact", "phone",
 			"01234 567890", "email", "email@address.com"
+		)
+		val result = sut.handleRequest(input = input, context = null)
+
+		expected.forEach { assertContains(result.body, it, message = "test word '$it' not found within result") }
+	}
+
+	@Test
+	fun `Test that handler returns gh lookup correctly`() {
+		val inputString = """{"test":"Shouldn't Matter"}"""
+		val path = "full"
+
+		val input =
+			APIGatewayV2HTTPEvent.builder().withBody(inputString).withPathParameters(mapOf("version" to path)).build()
+
+		val sut = DataLookup()
+		val expected = listOf<String>(
+			"name", "location", "city", "country", "contact", "phone", "email"
 		)
 		val result = sut.handleRequest(input = input, context = null)
 

@@ -3,16 +3,12 @@ package dev.markstanden.datastore
 import dev.markstanden.environment.getGithubVariables
 import dev.markstanden.models.CV
 import dev.markstanden.models.GitHubAPI
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.call.body
-import io.ktor.client.engine.cio.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
+import java.net.URL
+import java.net.http.HttpResponse
 
 class GitHub : DataStore {
 
@@ -59,46 +55,44 @@ class GitHub : DataStore {
 	override suspend fun getCV(id: String): Pair<CV?, HttpStatusCode> {
 		val fileContents = getFile(branch = id, fileName = CV_FILENAME)
 
-		// The raw file downloaded, parse to a CV object
-		val cv = json.decodeFromString<CV>(fileContents.body())
-
-		return Pair(cv, HttpStatusCode.OK)
+		if (fileContents.second == HttpStatusCode.OK) {
+			return fileContents
+		}
+		return Pair(null, fileContents.second)
 	}
 
-
-	override suspend fun getCover(id: String): Pair<String, HttpStatusCode> {
-		val fileContents = getFile(branch = id, fileName = COVER_LETTER_FILENAME)
-		return Pair(fileContents.body(), HttpStatusCode.OK)
-	}
-
-
-	private suspend fun getFile(branch: String, fileName: String): HttpResponse {
-		val client = HttpClient(CIO)
-		val getWithAuthorization = get(client)(env.personalAccessToken)
+	private suspend fun getFile(branch: String, fileName: String): Pair<CV?, HttpStatusCode> {
 		val url = repoURL(branch)(fileName)
-		val lookupResponse = getWithAuthorization(url)
-		// Abort early if the file is not found or inaccessible
-		if (lookupResponse.status != HttpStatusCode.OK) {
 
-			client.close()
-			return lookupResponse
+		val lookupResponse = try {
+			get<GitHubAPI.Contents>(env.personalAccessToken)(url)
+		}
+		catch (ex: Exception) {
+			println(ex)
+			return Pair(null, HttpStatusCode.NotFound)
 		}
 
 		// GH response for a file lookup contains the file SHA and a direct download link.
-		val fileInfo = json.decodeFromString<GitHubAPI.Contents>(lookupResponse.body())
-
-		return getWithAuthorization(fileInfo.download_url)
+		val repoData = try {
+			get<CV>(env.personalAccessToken)(lookupResponse.download_url)
+		}
+		catch (ex: java.lang.Exception) {
+			println(ex)
+			return Pair(null, HttpStatusCode.BadRequest)
+		}
+		return Pair(repoData, HttpStatusCode.OK)
 	}
 
-	private fun get(client: HttpClient) =
-		{ personalAccessToken: String ->
-			{ url: String ->
-				runBlocking {
-					client.get(url) {
-						headers["Accept"] = GITHUB_JSON
-						headers["Authorization"] = "token $personalAccessToken"
-					}
-				}
+	@OptIn(ExperimentalSerializationApi::class)
+	private inline fun <reified T> get(personalAccessToken: String) =
+		{ url: String ->
+			URL(url).openConnection().apply {
+				readTimeout = 800
+				connectTimeout = 200
+				setRequestProperty("Accept", GITHUB_JSON)
+				setRequestProperty("Authorization", "token $personalAccessToken")
+			}.getInputStream().use {
+				json.decodeFromStream<T>(it)
 			}
 		}
 }

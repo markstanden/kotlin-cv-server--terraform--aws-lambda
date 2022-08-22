@@ -29,7 +29,6 @@ dependencies {
 	implementation("io.ktor:ktor-client-core-jvm:2.1.0")
 	implementation("io.ktor:ktor-client-cio-jvm:2.1.0")
 	implementation("io.ktor:ktor-client-logging-jvm:2.1.0")
-	implementation("io.ktor:ktor-client-auth-jvm:2.1.0")
 //	implementation("com.amazonaws:aws-lambda-java-events:3.6.0")
 //	implementation("com.amazonaws:aws-lambda-java-tests:1.1.1")
 //	implementation("com.amazonaws:aws-java-sdk-bom:1.12.239")
