@@ -94,13 +94,16 @@ class GitHub(private val logger: LambdaLogger? = null) : DataStore {
 	@OptIn(ExperimentalSerializationApi::class)
 	private inline fun <reified T> get(personalAccessToken: String) =
 		{ url: String ->
+			logger?.log("GitHub::get called \n personalAccessToken: $personalAccessToken \n url: $url")
 			URL(url).openConnection().apply {
-				readTimeout = 800
-				connectTimeout = 200
+				readTimeout = 0
+				connectTimeout = 0
 				setRequestProperty("Accept", GITHUB_JSON)
 				setRequestProperty("Authorization", "token $personalAccessToken")
+				logger?.log("GitHub::getFile called \n ${this}")
 			}.getInputStream().use {
 				logger?.log("about to decode the following \n $it \n which has type: ${typeOf<T>()}")
+				println("about to decode the following \n $it \n which has type: ${typeOf<T>()}")
 				json.decodeFromStream<T>(it)
 			}
 		}
