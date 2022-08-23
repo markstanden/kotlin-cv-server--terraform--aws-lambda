@@ -9,11 +9,9 @@ import dev.markstanden.aws_response.respondNotFound
 import dev.markstanden.aws_response.respondOK
 import dev.markstanden.datastore.DataStore
 import dev.markstanden.datastore.GitHub
-import dev.markstanden.environment.EnvironmentVariables
-import dev.markstanden.environment.getGithubVariables
 import dev.markstanden.files.asResource
+import dev.markstanden.http.StatusCode
 import dev.markstanden.models.CV
-import io.ktor.http.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -21,35 +19,40 @@ import kotlinx.serialization.json.Json
 
 class DataLookup : RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
 
-
-	private val datastore: DataStore = GitHub()
-
 	override fun handleRequest(input: APIGatewayV2HTTPEvent?, context: Context?): APIGatewayV2HTTPResponse {
+
+		// create a logger
+		val logger = context?.logger
+
+		// Create an instance of the datastore
+		val datastore: DataStore = GitHub(logger)
 
 		// Obtain the path variable
 		val path = input?.pathParameters?.get("version")
 		//val bodyString = input?.body ?: ""
 
-		// Get the logger from the lambda context and log the path attempt.
-		context?.logger?.log("Access made with version: $path")
-
 		// Use Kotlin's serialise to convert body string into a kotlin data object.
 		//val body = jsonParser.decodeFromString<Handler_Input>(bodyString)
 
 		path?.apply {
+			// Get the logger from the lambda context and log the path attempt.
+			logger?.log("Access made with version: $path")
+
 			// Send the local sample
 			if (path == "sample") {
 				val cv = Json.decodeFromString(CV.serializer(), asResource(path = "/assets/sampleCV.json")!!)
 				return respondOK(cv)
 			}
 
-			val ghRes: Pair<CV?, HttpStatusCode> = runBlocking {
+			val ghRes: Pair<CV?, StatusCode> = runBlocking {
+				logger?.log("coroutine begun ok")
 				datastore.getCV(path)
 			}
+			logger?.log("coroutine ends")
 
-			context?.logger?.log(ghRes.toString())
+			logger?.log(ghRes.toString())
 
-			if (ghRes.second == HttpStatusCode.OK) {
+			if (ghRes.second == StatusCode.OK) {
 				return respondOK(ghRes.first)
 			}
 		}

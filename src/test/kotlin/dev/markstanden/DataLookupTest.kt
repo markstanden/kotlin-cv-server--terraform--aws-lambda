@@ -2,7 +2,7 @@ package dev.markstanden
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse
-import io.ktor.http.*
+import dev.markstanden.http.StatusCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import kotlin.test.assertContains
@@ -39,7 +39,7 @@ internal class DataLookupTest {
 			APIGatewayV2HTTPEvent.builder().withBody(inputString).withPathParameters(mapOf("version" to path)).build()
 
 		val sut = DataLookup()
-		val expected = listOf<String>(
+		val expected = listOf(
 			"name", "First Second", "location", "city", "City", "country", "Country", "contact", "phone",
 			"01234 567890", "email", "email@address.com"
 		)
@@ -75,6 +75,6 @@ internal class DataLookupTest {
 
 		val sut = DataLookup()
 		val result = sut.handleRequest(input = input, context = null)
-		assertFalse(result.statusCode == HttpStatusCode.OK.value)
+		assertFalse(result.statusCode == StatusCode.OK.code)
 	}
 }

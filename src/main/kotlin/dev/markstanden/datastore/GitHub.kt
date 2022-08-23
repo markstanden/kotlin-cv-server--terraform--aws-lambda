@@ -3,14 +3,15 @@ package dev.markstanden.datastore
 import dev.markstanden.environment.getGithubVariables
 import dev.markstanden.models.CV
 import dev.markstanden.models.GitHubAPI
-import io.ktor.http.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import java.net.URL
-import java.net.http.HttpResponse
+import com.amazonaws.services.lambda.runtime.LambdaLogger
+import dev.markstanden.http.StatusCode
+import kotlin.reflect.typeOf
 
-class GitHub : DataStore {
+class GitHub(private val logger: LambdaLogger? = null) : DataStore {
 
 	override val baseBranch = "full"
 
@@ -23,9 +24,6 @@ class GitHub : DataStore {
 
 		/** The filename of the CV file in the repo */
 		private const val CV_FILENAME = "cv.json"
-
-		/** The filename of the cover letter file in the repo */
-		private const val COVER_LETTER_FILENAME = "coverletter.json"
 
 		/** creates a Json object for use by the class */
 		private val json = Json { ignoreUnknownKeys = true }
@@ -52,25 +50,34 @@ class GitHub : DataStore {
 			}
 	}
 
-	override suspend fun getCV(id: String): Pair<CV?, HttpStatusCode> {
-		val fileContents = getFile(branch = id, fileName = CV_FILENAME)
+	override suspend fun getCV(id: String): Pair<CV?, StatusCode> {
+		logger?.log("GitHub::getCV called with id \n $id")
 
-		if (fileContents.second == HttpStatusCode.OK) {
+		val fileContents = getFile(branch = id)
+
+		logger?.log("results returned from GitHub::getFile \n $fileContents")
+
+		if (fileContents.second == StatusCode.OK) {
 			return fileContents
 		}
 		return Pair(null, fileContents.second)
 	}
 
-	private suspend fun getFile(branch: String, fileName: String): Pair<CV?, HttpStatusCode> {
-		val url = repoURL(branch)(fileName)
+	private fun getFile(branch: String): Pair<CV?, StatusCode> {
+		logger?.log("GitHub::getFile called \n branch: $branch, fileName: $CV_FILENAME")
+
+		val url = repoURL(branch)(CV_FILENAME)
 
 		val lookupResponse = try {
 			get<GitHubAPI.Contents>(env.personalAccessToken)(url)
 		}
 		catch (ex: Exception) {
 			println(ex)
-			return Pair(null, HttpStatusCode.NotFound)
+			return Pair(null, StatusCode.NotFound)
 		}
+
+		logger?.log("result of initial lookup within GitHub::getFile \n $lookupResponse")
+
 
 		// GH response for a file lookup contains the file SHA and a direct download link.
 		val repoData = try {
@@ -78,9 +85,10 @@ class GitHub : DataStore {
 		}
 		catch (ex: java.lang.Exception) {
 			println(ex)
-			return Pair(null, HttpStatusCode.BadRequest)
+			return Pair(null, StatusCode.BadRequest)
 		}
-		return Pair(repoData, HttpStatusCode.OK)
+		logger?.log("repodata results returned from second lookup within GitHub::getFile \n $repoData")
+		return Pair(repoData, StatusCode.OK)
 	}
 
 	@OptIn(ExperimentalSerializationApi::class)
@@ -92,6 +100,7 @@ class GitHub : DataStore {
 				setRequestProperty("Accept", GITHUB_JSON)
 				setRequestProperty("Authorization", "token $personalAccessToken")
 			}.getInputStream().use {
+				logger?.log("about to decode the following \n $it \n which has type: ${typeOf<T>()}")
 				json.decodeFromStream<T>(it)
 			}
 		}

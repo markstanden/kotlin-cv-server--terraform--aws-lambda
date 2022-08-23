@@ -23,16 +23,10 @@ repositories {
 
 dependencies {
 	implementation(kotlin("stdlib:1.7.10"))
-	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0-RC")
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 	implementation("com.amazonaws:aws-lambda-java-core:1.2.1")
 	implementation("com.amazonaws:aws-lambda-java-events:3.11.0")
-	implementation("io.ktor:ktor-client-core-jvm:2.1.0")
-	implementation("io.ktor:ktor-client-cio-jvm:2.1.0")
-	implementation("io.ktor:ktor-client-logging-jvm:2.1.0")
-//	implementation("com.amazonaws:aws-lambda-java-events:3.6.0")
-//	implementation("com.amazonaws:aws-lambda-java-tests:1.1.1")
-//	implementation("com.amazonaws:aws-java-sdk-bom:1.12.239")
-//	implementation("com.amazonaws:aws-lambda-java-events-sdk-transformer:3.1.0")
 	testImplementation(kotlin("test"))
 	implementation("io.github.cdimascio:dotenv-kotlin:$dotenv_version")
 }

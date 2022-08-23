@@ -97,6 +97,12 @@ resource "aws_cloudwatch_log_group" "lambda-log" {
 resource "aws_apigatewayv2_api" "lambda" {
   name          = "${var.name}_gateway"
   protocol_type = "HTTP"
+  cors_configuration {
+    allow_origins = ["https://api.github.com"]
+    allow_methods = ["POST", "GET"]
+    allow_headers = ["content-type", "Accept", "Authorization"]
+    max_age = 300
+  }
 }
 
 resource "aws_apigatewayv2_stage" "lambda" {

@@ -1,10 +1,10 @@
 package dev.markstanden.datastore
 
+import dev.markstanden.http.StatusCode
 import dev.markstanden.models.CV
-import io.ktor.http.*
 
 interface DataStore {
-	suspend fun getCV(id: String): Pair<CV?, HttpStatusCode>
+	suspend fun getCV(id: String): Pair<CV?, StatusCode>
 
 	val baseBranch: String
 }
