@@ -74,7 +74,7 @@ resource "aws_lambda_function" "lambda" {
   role             = aws_iam_role.lambda-exec.arn
   handler          = "dev.markstanden.DataLookup::handleRequest"
   runtime          = "java11"
-  timeout          = 20
+  timeout          = 60
   environment {
     variables = {
       PERSONAL_ACCESS_TOKEN = var.github_secret_key
@@ -91,18 +91,12 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 }
 resource "aws_cloudwatch_log_group" "lambda-log" {
   name              = "/aws/lambda/${aws_lambda_function.lambda.function_name}"
-  retention_in_days = 7
+  retention_in_days = 1
 }
 
 resource "aws_apigatewayv2_api" "lambda" {
   name          = "${var.name}_gateway"
   protocol_type = "HTTP"
-  cors_configuration {
-    allow_origins = ["https://api.github.com"]
-    allow_methods = ["POST", "GET"]
-    allow_headers = ["content-type", "Accept", "Authorization"]
-    max_age = 300
-  }
 }
 
 resource "aws_apigatewayv2_stage" "lambda" {
@@ -137,7 +131,7 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   integration_method = "POST"
 }
 
-resource "aws_apigatewayv2_route" "lambda_route" {
+resource "aws_apigatewayv2_route" "lambda_route__post" {
   api_id = aws_apigatewayv2_api.lambda.id
 
   route_key = "POST /{version}"

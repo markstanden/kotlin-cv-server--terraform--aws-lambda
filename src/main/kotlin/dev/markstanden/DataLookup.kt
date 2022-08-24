@@ -9,11 +9,14 @@ import dev.markstanden.aws_response.respondNotFound
 import dev.markstanden.aws_response.respondOK
 import dev.markstanden.datastore.DataStore
 import dev.markstanden.datastore.GitHub
+import dev.markstanden.environment.getGithubVariables
 import dev.markstanden.files.asResource
 import dev.markstanden.http.StatusCode
 import dev.markstanden.models.CV
-import kotlinx.coroutines.launch
+import dev.markstanden.models.ErrorMessage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 
@@ -25,7 +28,7 @@ class DataLookup : RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPRespons
 		val logger = context?.logger
 
 		// Create an instance of the datastore
-		val datastore: DataStore = GitHub(logger)
+		val datastore: DataStore = GitHub(getGithubVariables(), logger)
 
 		// Obtain the path variable
 		val path = input?.pathParameters?.get("version")
@@ -44,19 +47,20 @@ class DataLookup : RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPRespons
 				return respondOK(cv)
 			}
 
-			val ghRes: Pair<CV?, StatusCode> = runBlocking {
-				logger?.log("coroutine begun ok")
-				datastore.getCV(path)
+			var ghRes: Pair<CV?, StatusCode>
+			runBlocking {
+				ghRes =
+					withContext(Dispatchers.Default) {
+						datastore.getCV(path)
+					}
 			}
-			logger?.log("coroutine ends")
 
 			logger?.log(ghRes.toString())
 
-			if (ghRes.second == StatusCode.OK) {
-				return respondOK(ghRes.first)
-			}
+			return if (ghRes.second == StatusCode.OK) respondOK(ghRes.first)
+			else respondNotFound(ErrorMessage(error = "There was a problem, ${ghRes.second}"))
 		}
-		return respondNotFound("""{"error":"Version not specified in url, default route not defined"}""")
+		return respondNotFound(ErrorMessage(error = "Version not specified in url, default route not defined"))
 	}
 
 }
