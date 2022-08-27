@@ -44,8 +44,8 @@ class GitHub(private val id: GitHubIdentification, private val logger: LambdaLog
 			{ baseDir: String ->
 				{ branch: String ->
 					{ filename: String ->
-						val subDir = if (baseDir.isEmpty()) "$baseDir/" else ""
-						"$BASE_URL/repos/$userName/$repoName/contents/$subDir$filename?ref=$branch"
+						val path = if (baseDir.isNotEmpty()) "$baseDir/$filename" else filename
+						"$BASE_URL/repos/$userName/$repoName/contents/$path?ref=$branch"
 					}
 				}
 			}
