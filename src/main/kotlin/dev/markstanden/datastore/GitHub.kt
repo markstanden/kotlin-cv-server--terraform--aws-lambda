@@ -16,6 +16,9 @@ class GitHub(private val id: GitHubIdentification, private val logger: LambdaLog
 	override val baseBranch = "full"
 
 	companion object {
+		/** GitHub API base url */
+		const val BASE_URL = "https://api.github.com"
+
 		/** GitHub recommends the following accept string */
 		private const val GITHUB_JSON = "application/vnd.github.v3+json"
 
@@ -41,7 +44,8 @@ class GitHub(private val id: GitHubIdentification, private val logger: LambdaLog
 			{ baseDir: String ->
 				{ branch: String ->
 					{ filename: String ->
-						"https://api.github.com/repos/$userName/$repoName/contents/${if (baseDir != "") "$baseDir/" else ""}$filename?ref=$branch"
+						val subDir = if (baseDir.isEmpty()) "$baseDir/" else ""
+						"$BASE_URL/repos/$userName/$repoName/contents/$subDir$filename?ref=$branch"
 					}
 				}
 			}
