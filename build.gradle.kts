@@ -36,9 +36,11 @@ tasks.shadowJar {
 	archiveClassifier.set("")
 	archiveVersion.set("")
 }
-
 tasks.test {
 	useJUnitPlatform()
+	if (project.hasProperty("skipEndToEnd")) {
+		this.exclude("**/EndToEndTests.class")
+	} // EndToEndTests may not pass yet as they haven't been deployed.
 }
 
 tasks.withType<KotlinCompile> {

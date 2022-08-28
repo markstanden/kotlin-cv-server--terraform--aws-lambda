@@ -6,8 +6,7 @@ import dev.markstanden.http.StatusCode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import kotlin.test.assertContains
-
-internal class DataLookupTest {
+class DataLookupTest {
 	@Test
 	fun `Test that function returns correct basic response headers`() {
 		val inputString = """{"test":"Shouldn't Matter"}"""
