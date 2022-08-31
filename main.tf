@@ -154,10 +154,6 @@ resource "aws_lambda_permission" "api_gw" {
 }
 
 
-output "url" {
-  value = aws_apigatewayv2_api.lambda.api_endpoint
-}
-
-output "url_with_stage" {
-  value = aws_apigatewayv2_api.lambda.target
+output "base_url" {
+  value = "${aws_apigatewayv2_api.lambda.api_endpoint}/${aws_apigatewayv2_stage.lambda.name}"
 }
